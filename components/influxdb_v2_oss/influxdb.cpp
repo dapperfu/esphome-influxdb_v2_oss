@@ -107,6 +107,7 @@ void InfluxDB::loop() {
 
       // Find all queued messages that go to the same url
       std::vector<size_t> active_indices;
+      active_indices.reserve(this->backlog_drain_batch_);  // Reserve max expected size
       size_t len = 0;
       for (size_t i = 0; i < this->backlog_.size(); ++i) {
         if (this->backlog_[i].url == m.url && active_indices.size() < this->backlog_drain_batch_) {
