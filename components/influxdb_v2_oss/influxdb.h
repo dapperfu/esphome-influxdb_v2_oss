@@ -66,7 +66,7 @@ protected:
   std::list<Field*> fields_;
 
   time::RealTimeClock *clock_{nullptr};
-  std::list<BacklogEntry> backlog_;
+  std::vector<BacklogEntry> backlog_;
   uint8_t backlog_max_depth_{20};
   uint8_t backlog_drain_batch_{5};
 };

@@ -102,26 +102,27 @@ void InfluxDB::loop() {
       auto& m = this->backlog_.front();
 
       // Find all queued messages that go to the same url
-      std::list<std::list<BacklogEntry>::iterator> active;
+      std::vector<size_t> active_indices;
       size_t len = 0;
-      for (std::list<BacklogEntry>::iterator it = this->backlog_.begin(); it != this->backlog_.end(); ++it) {
-        if (it->url == m.url && active.size() < this->backlog_drain_batch_) {
-          active.push_back(it);
-          len += it->length;
+      for (size_t i = 0; i < this->backlog_.size(); ++i) {
+        if (this->backlog_[i].url == m.url && active_indices.size() < this->backlog_drain_batch_) {
+          active_indices.push_back(i);
+          len += this->backlog_[i].length;
         }
       }
 
       std::string body;
       ESP_LOGD(TAG, "Reserving memory for influxdb POST body: %d b", len);
       body.reserve(len);
-      for (auto& item : active)
-        item->append( body );
+      for (auto idx : active_indices)
+        this->backlog_[idx].append( body );
       bool success = this->send_data(m.url, std::move(body));
 
       if (success) {
-        for (auto& item : active) {
+        // Erase in reverse order to maintain valid indices
+        for (auto it = active_indices.rbegin(); it != active_indices.rend(); ++it) {
           item_count++;
-          this->backlog_.erase(item);
+          this->backlog_.erase(this->backlog_.begin() + *it);
         }
       } else {
         break;
@@ -142,7 +143,7 @@ void InfluxDB::queue(BacklogEntry&& data) {
   ESP_LOGD(TAG, "Adding data (%d) into the InfluxDB queue for %s", data.length, data.url.c_str());
   if (this->backlog_.size() == this->backlog_max_depth_) {
     ESP_LOGW(TAG, "Backlog is full, dropping oldest entries.");
-    this->backlog_.pop_front();
+    this->backlog_.erase(this->backlog_.begin());
   }
   this->backlog_.push_back(data);
   this->enable_loop();
