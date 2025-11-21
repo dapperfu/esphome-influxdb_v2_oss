@@ -29,7 +29,11 @@ public:
   void loop() override;
   void set_http_request(http_request::HttpRequestComponent *http) { this->http_request_ = http; };
   void set_url(std::string url) { this->url_ = std::move(url); }
-  void set_token(std::string token) { this->token_ = std::string("Token ") + token; }
+  void set_token(std::string token) {
+    this->token_.reserve(6 + token.size());  // "Token " prefix + token
+    this->token_ = "Token ";
+    this->token_ += token;
+  }
   void set_measurement(std::string measurement) { this->measurement_ = measurement; }
   void set_default_name_policy(DefaultNamePolicy default_name_policy) { this->default_name_policy = default_name_policy; }
   void set_publish_all(bool publish_all) { this->publish_all_ = publish_all; }
