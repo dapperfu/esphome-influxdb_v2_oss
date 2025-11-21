@@ -3,6 +3,7 @@
 
 #include "backlog_entry.h"
 #include "field.h"
+#include "influxdb.h"
 
 
 namespace esphome {
