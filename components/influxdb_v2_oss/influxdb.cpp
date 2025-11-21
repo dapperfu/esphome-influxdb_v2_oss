@@ -8,6 +8,10 @@
 namespace esphome {
 namespace influxdb {
 
+// J2000 epoch: 2000-01-01 00:00:00 UTC (946684800 seconds since Unix epoch)
+// Using 946681200 as threshold to check if we have an absolute time
+static constexpr time_t MIN_VALID_TIMESTAMP = 946681200;
+
 void InfluxDB::setup() {
   http_request::Header header;
 
@@ -135,7 +139,7 @@ void InfluxDB::loop() {
 }
 
 void InfluxDB::queue(BacklogEntry&& data) {
-  if (data.timestamp < 946681200 /* J2000, check is we have an absolute time */) {
+  if (data.timestamp < MIN_VALID_TIMESTAMP) {
     ESP_LOGW(TAG, "Cannot submit influxdb metrics for %s, clock is not ready!", data.field->get_field_name().c_str());
     return;
   }
