@@ -1,6 +1,5 @@
 
 #include <string>
-#include <regex>
 
 #include "field.h"
 #include "influxdb.h"
@@ -8,6 +7,18 @@
 
 namespace esphome {
 namespace influxdb {
+
+static std::string escape_influxdb_string(const std::string& input) {
+  std::string result;
+  result.reserve(input.size() + input.size() / 4);  // Estimate: ~25% overhead for escaped chars
+  for (char c : input) {
+    if (c == ',' || c == ' ' || c == '=' || c == '\\') {
+      result += '\\';
+    }
+    result += c;
+  }
+  return result;
+}
 
 void Field::setup(DefaultNamePolicy default_name_policy) {
   auto device_class = this->sensor_object_device_class();
@@ -38,8 +49,8 @@ void Field::setup(DefaultNamePolicy default_name_policy) {
 }
 
 void Field::add_tag(const std::string& tag, const std::string &value) {
-  std::string escaped_tag = std::regex_replace(tag, std::regex("([, =\\\\])"), "\\$1");
-  std::string escaped_value = std::regex_replace(value, std::regex("([, =\\\\])"), "\\$1");
+  std::string escaped_tag = escape_influxdb_string(tag);
+  std::string escaped_value = escape_influxdb_string(value);
   this->tags_.emplace_back( escaped_tag, escaped_value );
 }
 
