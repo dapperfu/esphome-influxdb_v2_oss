@@ -8,7 +8,6 @@
 namespace esphome {
 namespace influxdb {
 
-#ifdef USE_BINARY_SENSOR
 class BinarySensorField : public Field {
 public:
   void set_sensor(binary_sensor::BinarySensor *sensor) { this->sensor_ = sensor; }
@@ -23,7 +22,6 @@ public:
 protected:
   binary_sensor::BinarySensor *sensor_;
 };
-#endif
 
 }  // namespace influxdb
 }  // namespace esphome
