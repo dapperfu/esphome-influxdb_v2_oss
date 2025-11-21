@@ -104,13 +104,11 @@ void InfluxDB::loop() {
       // Find all queued messages that go to the same url
       std::list<std::list<BacklogEntry>::iterator> active;
       size_t len = 0;
-      uint_fast8_t idx;
       for (std::list<BacklogEntry>::iterator it = this->backlog_.begin(); it != this->backlog_.end(); ++it) {
-        if (it->url == it->url && active.size() < this->backlog_drain_batch_) {
+        if (it->url == m.url && active.size() < this->backlog_drain_batch_) {
           active.push_back(it);
           len += it->length;
         }
-        idx++;
       }
 
       std::string body;
