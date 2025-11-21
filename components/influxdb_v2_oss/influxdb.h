@@ -42,7 +42,7 @@ public:
   void set_backlog_max_depth(uint8_t val) { this->backlog_max_depth_ = val; }
   void set_backlog_drain_batch(uint8_t val) { this->backlog_drain_batch_ = val; }
   void add_field(Field* field) { this->fields_.push_back(field); }
-  const std::string &get_url() { return this->url_; }
+  const std::string &get_url() const { return this->url_; }
 
   void queue(BacklogEntry&& entry);
 
