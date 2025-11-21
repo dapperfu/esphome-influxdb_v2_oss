@@ -9,9 +9,11 @@ namespace influxdb {
 void TextSensorField::do_setup() {}
 
 std::string TextSensorField::to_value() const {
+  const std::string& state = this->sensor_->get_state();
   std::string value;
+  value.reserve(state.size() + 2);  // Two quotes + state string
   value += '"';
-  value += this->sensor_->get_state();
+  value += state;
   value += '"';
   return value;
 }
